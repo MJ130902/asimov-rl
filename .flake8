@@ -1,0 +1,8 @@
+[flake8]
+# Keep in sync with `line-length` in src/pyproject.toml ([tool.black]).
+max-line-length = 80
+max-complexity = 10
+# Cognitive complexity (flake8-cognitive-complexity, code CCR001). 15 is the Sonar default.
+max-cognitive-complexity = 15
+# Black-compatible: E203 (space before ':' in slices), W503 (line break before binary operator).
+extend-ignore = E203, W503

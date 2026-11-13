@@ -1,0 +1,87 @@
+name: "Chore / Tooling"
+description: "Infrastructure, build, CI, test or dev-container work with no feature or bug"
+title: "[Chore] "
+labels:
+  - "type:chore"
+projects:
+  - "Synobotix/4"
+type: Triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Chore / Tooling
+
+        Use this form for **infrastructure, build, CI, test and dev-container work**
+        that changes no product behavior.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: |
+        Why this work is needed and what is wrong or missing today.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: |
+        Objective, testable criteria for completion.
+      placeholder: |
+        - The workflow runs on pull requests
+        - [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: |
+        Blocking issues, libraries or prior work. Write "None" if there are none.
+      placeholder: |
+        Blocked by #123
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Delivery priority
+      options:
+        - P0 - Critical (blocks other work)
+        - P1 - High (important for near-term delivery)
+        - P2 - Medium (valuable but not urgent)
+        - P3 - Low (nice to have)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track
+      description: Work track
+      options:
+        - A - Simulation and RL (track:sim-rl)
+        - B - Infra and quality (track:infra)
+        - C - Research (track:research)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: definition_of_done
+    attributes:
+      label: Definition of Done
+      description: |
+        All items must be satisfied before closing.
+      options:
+        - label: Acceptance criteria are fully met
+          required: true
+        - label: Documentation updated (if applicable)
+          required: true
+        - label: Checks pass in CI (if applicable)
+          required: true

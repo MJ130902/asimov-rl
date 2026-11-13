@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asimov-rl"
+# NOT-IMPLEMENTED: no release exists. Bump when the first package is tagged.
+version = "0.0.0"
+description = "Simulated humanoid in MuJoCo MJX driven by a low-level RL policy and a high-level vision-language-action model"
+readme = "../README.md"
+license = { text = "GPL-3.0-only" }
+authors = [{ name = "Synobotix" }]
+# Not validated against the planned stack. Confirm with the first working install.
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Planned stack (see README, "Built With"). Versions are not pinned yet: pin them
+# in the same change that runs the first simulation, together with
+# sim/mujoco/requirements.txt.
+dependencies = [
+    "numpy",
+    "mujoco",
+    "mujoco-mjx",
+    "jax",       # GPU build (CUDA extra) is a decision still to make for the dev container
+    "torch",
+    "lerobot",   # SmolVLA
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "black",
+    "flake8",
+    "flake8-bugbear",
+    "flake8-simplify",
+    "flake8-cognitive-complexity",
+    "mypy",
+    "bandit",
+    "pytest",
+    "pytest-cov",
+    "radon",
+    "xenon",
+    "vulture",
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+]
+
+[project.urls]
+Repository = "https://github.com/synobotix/asimov-rl"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nodes*", "shared*", "utils*"]
+
+# ---------------------------------------------------------------------------
+# Tools
+# ---------------------------------------------------------------------------
+
+[tool.black]
+# Keep in sync with max-line-length in the root .flake8.
+line-length = 80
+
+[tool.mypy]
+# DEV.md: type hints on public functions and data structures.
+disallow_untyped_defs = true
+warn_unused_ignores = true
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
+
+[tool.coverage.run]
+branch = true
+source = ["nodes", "shared", "utils"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
