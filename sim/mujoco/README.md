@@ -21,6 +21,12 @@ pip install -e .
 
 Optional dependencies are in `requirements-rl.txt` (reinforcement learning) and `requirements-video.txt` (video recording), when present.
 
+## Asimov demo
+
+![Asimov standing and recovering from a push](docs/asimov_stand.gif)
+
+*Asimov v1 standing for 8 simulated seconds, with a 100 N push on the pelvis at 4 s. Video: [docs/asimov_stand.mp4](docs/asimov_stand.mp4). Regenerate with `python scripts/asimov_stand.py --push 100` (needs `requirements-video.txt` and the model, see `docs/asimov_standing.md`).*
+
 ## Tests
 
 ```bash

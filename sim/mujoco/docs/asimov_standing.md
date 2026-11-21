@@ -20,6 +20,8 @@ Simulation only, no noise, flat floor, on MuJoCo 4.0.1.
 - A forward push of 100 N for 0.1 s on the pelvis is absorbed. 150 N makes it fall.
 - Without the controller the robot falls within 4 s (covered by a test).
 
+![Asimov standing](asimov_stand.gif)
+
 ## Not covered
 
 Walking, other floors, and any real-robot behaviour.
