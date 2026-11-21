@@ -2,6 +2,12 @@
 
 Robotics simulation with [MuJoCo](https://github.com/google-deepmind/mujoco): load a robot described in a URDF file, add what URDF cannot describe (floor, light, camera, motors) and simulate it.
 
+## Reaching demo
+
+![Trained agent reaching targets](docs/demo_policy.gif)
+
+*PPO agent moving the arm tip to random targets (green). Video: [docs/demo_policy.mp4](docs/demo_policy.mp4). Regenerate with `python scripts/make_video.py` after training (see `docs/reach_rl.md`; needs `requirements-rl.txt` and `requirements-video.txt`).*
+
 ## Setup
 
 Run everything from `sim/mujoco/`.
