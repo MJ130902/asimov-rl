@@ -4,28 +4,66 @@ import mujoco
 import numpy as np
 
 
-def build_model(urdf_path: str) -> mujoco.MjModel:
+def build_model(
+    urdf_path: str,
+    control: str = "torque",
+    tip_body: str | None = None,
+    tip_offset: tuple = (0.0, 0.0, 0.0),
+    floor: bool = True,
+    kp: float = 50.0,
+    kv: float = 8.0,
+    max_force: float = 20.0,
+) -> mujoco.MjModel:
     """Load a URDF and complete it with what URDF cannot describe.
 
     URDF has no floor, light, camera or motor, so they are added here:
-    a floor, a light, a camera named "front", and one torque motor per joint.
+    a floor, a light, a camera named "front", and one motor per joint.
 
     Args:
         urdf_path (str): Path to the URDF file.
+        control (str): "torque" for direct torque motors (ctrl in [-5, 5]), or "position"
+            for position servos (ctrl = target joint angle within the joint range).
+        tip_body (str | None): Name of the body that carries the end effector. If given,
+            a site named "tip" is added to it.
+        tip_offset (tuple): Position of the "tip" site in the frame of `tip_body`.
+        floor (bool): Whether to add a floor.
+        kp (float): Stiffness of the position servos.
+        kv (float): Damping of the position servos.
+        max_force (float): Torque limit of the position servos.
 
     Returns:
         mujoco.MjModel: Compiled model ready for simulation.
     """
+    if control not in ("torque", "position"):
+        raise ValueError(f"control must be 'torque' or 'position', got {control!r}")
     spec = mujoco.MjSpec.from_file(str(urdf_path))
-    spec.worldbody.add_geom(
-        name="floor", type=mujoco.mjtGeom.mjGEOM_PLANE, size=[2, 2, 0.1], rgba=[0.8, 0.8, 0.8, 1]
-    )
+    if control == "position":
+        # The servo damping is stiff for these light links: with the default explicit
+        # Euler integrator the joints chatter and never settle. Implicit integration does.
+        spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
+    if floor:
+        spec.worldbody.add_geom(
+            name="floor", type=mujoco.mjtGeom.mjGEOM_PLANE, size=[2, 2, 0.1], rgba=[0.8, 0.8, 0.8, 1]
+        )
     spec.worldbody.add_light(pos=[0, 0, 2], dir=[0, 0, -1])
     spec.worldbody.add_camera(name="front", pos=[1.2, 0, 0.5], xyaxes=[0, 1, 0, -0.3, 0, 1])
     for joint in spec.joints:
         motor = spec.add_actuator(name=joint.name, target=joint.name, trntype=mujoco.mjtTrn.mjTRN_JOINT)
-        motor.ctrllimited = True
-        motor.ctrlrange = [-5, 5]
+        if control == "torque":
+            motor.ctrllimited = True
+            motor.ctrlrange = [-5, 5]
+        else:
+            motor.gaintype = mujoco.mjtGain.mjGAIN_FIXED
+            motor.biastype = mujoco.mjtBias.mjBIAS_AFFINE
+            motor.gainprm[0] = kp
+            motor.biasprm[1] = -kp
+            motor.biasprm[2] = -kv
+            motor.ctrllimited = True
+            motor.ctrlrange = list(joint.range)
+            motor.forcelimited = True
+            motor.forcerange = [-max_force, max_force]
+    if tip_body is not None:
+        spec.body(tip_body).add_site(name="tip", pos=list(tip_offset), size=[0.01, 0, 0])
     return spec.compile()
 
 

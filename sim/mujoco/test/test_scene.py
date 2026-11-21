@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import mujoco
 import numpy as np
 import pytest
 
@@ -48,3 +49,27 @@ def test_render_frames():
         pytest.skip(f"graphics backend unavailable: {error}")
     assert frames.shape == (2, 64, 64, 3)
     assert frames.dtype == np.uint8
+
+
+def test_position_servos_reach_their_target():
+    model = build_model(URDF, control="position")
+    data = mujoco.MjData(model)
+    data.ctrl[:] = [0.5, -0.5]
+    for _ in range(1500):
+        mujoco.mj_step(model, data)
+    np.testing.assert_allclose(data.qpos, [0.5, -0.5], atol=0.05)
+
+
+def test_tip_site_is_added_on_request():
+    assert build_model(URDF).nsite == 0
+    model = build_model(URDF, tip_body="fore", tip_offset=(0.0, 0.0, 0.25))
+    assert model.nsite == 1
+
+
+def test_floor_is_optional():
+    assert build_model(URDF, floor=False).ngeom == build_model(URDF).ngeom - 1
+
+
+def test_unknown_control_mode_raises():
+    with pytest.raises(ValueError):
+        build_model(URDF, control="velocity")
